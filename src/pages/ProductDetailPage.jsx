@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./ProductDetailPage.css";
 import { getSessionId } from "../utils/session";
+import { useRef } from "react";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -10,7 +11,8 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isZoomed, setIsZoomed] = useState(false);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-
+  const [adding, setAdding] = useState(false); 
+  const clickGuard = useRef(false); 
   useEffect(() => {
     axios.get(`/api/products/${slug}`)
       .then(res => {
@@ -22,6 +24,10 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     try {
+       if (adding || clickGuard.current) return;
+         clickGuard.current = true;
+         setAdding(true);
+      if (!product?._id) return;
       const sessionId = getSessionId();
       console.log("sessionId:", sessionId);
       console.log("productId:", product?._id);
@@ -31,13 +37,19 @@ export default function ProductDetailPage() {
         sessionId,
         productId: product._id,
         quantity: selectedQuantity,
+        variant: product.variant || product.options || null,
+        isPrint: !!product.isPrint,
+        idemKey: crypto.randomUUID?.() || String(Date.now()) + Math.random(),
       });
       setSelectedQuantity(1);
       alert("Added to cart!");
     } catch (err) {
       console.error("Failed to add to cart:", err);
       alert("Could not add to cart.");
-    }
+    }finally {
+    setAdding(false);
+    clickGuard.current = false;
+   }
   };
 
   if (!product) return <p>Loading...</p>;
@@ -57,13 +69,13 @@ export default function ProductDetailPage() {
           <div className="thumbnail-container">
             <div className="thumbnail-row-scroll">
               {product.images.map((img, i) => (
-                <img
-                  key={i}
-                  src={img.url}
-                  alt={`Thumbnail ${i}`}
-                  className={`thumbnail ${selectedImage === img.url ? "active" : ""}`}
-                  onClick={() => setSelectedImage(img.url)}
-                />
+              <img
+                key={img._id || img.url || `thumb-${i}`}
+                src={img.url}
+                alt={`Thumbnail ${i}`}
+                className={`thumbnail ${selectedImage === img.url ? "active" : ""}`}
+                onClick={() => setSelectedImage(img.url)}
+              />
               ))}
             </div>
           </div>
@@ -130,6 +142,7 @@ export default function ProductDetailPage() {
             className="add-to-cart"
             disabled={product.sold}
             onClick={!product.sold ? handleAddToCart : undefined}
+            type="button"
             style={{ opacity: product.sold ? 0.5 : 1 }}
           >
             {product.sold ? "SOLD" : "Add To Cart"}

@@ -76,3 +76,63 @@
 .cart-delete-button:hover {
   color: #e74c3c;
 }
+
+.cart-item-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid #000000;
+  background: #fff;
+  color: #000000;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  font-style: normal;      /* not slanted */
+  transform: none;
+  cursor: pointer;
+  padding: 0;
+}
+.qty-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.qty-num {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  color: #e53935;
+}
+
+.qty-fixed {
+  font-weight: 700;
+  color: #666;
+}
+
+/* RED trash button like before */
+.cart-delete-button {
+  background: none;
+  border: none;
+  color: #000000;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+.cart-delete-button:hover { color: #b71c1c; }
+
