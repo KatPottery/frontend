@@ -1,0 +1,18 @@
+
+.carts-page {
+  padding: 20px;
+}
+
+.carts-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.carts-table th,
+.carts-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+  vertical-align: top;
+}

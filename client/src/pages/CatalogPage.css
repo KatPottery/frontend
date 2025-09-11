@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #000;
+}
+
+.page-wrapper {
+  padding-left: 1vw;
+  padding-right: 1vw;
+  padding-top: 3%;
+  box-sizing: border-box;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+.masonry {
+  column-count: 2;
+  column-gap: 0vw;
+}
+
+.catalog-item {
+  break-inside: avoid;
+  padding-right: 1vw;
+  margin-bottom: 2rem;
+}
+
+.catalog-item img {
+  width: 100%;
+  display: block;
+  margin: 0;
+}
+
+.caption {
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+  line-height: 1.3rem;
+}
+
+.caption .title {
+  display: block;
+}
+
+.caption .year {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .masonry {
+    column-count: 1;
+  }
+}

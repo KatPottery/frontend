@@ -1,0 +1,17 @@
+.admin-product-list {
+  padding: 20px;
+}
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.product-table th,
+.product-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+.product-table img {
+  max-height: 80px;
+  object-fit: cover;
+}

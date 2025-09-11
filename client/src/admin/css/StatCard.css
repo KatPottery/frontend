@@ -1,0 +1,30 @@
+.stat-card {
+  background: white;
+  padding: 1rem;
+  border: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
+}
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+.stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #272727;
+}
+.stat-change {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.stat-change.positive {
+  color: #16a34a;
+}
+.stat-change.negative {
+  color: #dc2626;
+}

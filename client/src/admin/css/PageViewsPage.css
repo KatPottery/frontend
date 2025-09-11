@@ -1,0 +1,15 @@
+.pageviews-wrapper {
+  padding: 20px;
+}
+
+.session-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.session-table th,
+.session-table td {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  text-align: left;
+}

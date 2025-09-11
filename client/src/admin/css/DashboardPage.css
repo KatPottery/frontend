@@ -1,0 +1,58 @@
+.dashboard-wrapper {
+  flex: 1;
+  min-width: 0;       
+  max-width: 100%;
+  padding-bottom: 30px;
+}
+
+.dashboard-heading {
+  font-size: 30px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  color: rgb(32, 32, 32);
+  margin-bottom: 1rem;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+.card-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+.dashboard-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.dashboard-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+}
+.dashboard-card.wide {
+  grid-column: span 2;
+}
+
+.dashboard-widget-form {
+  margin: 2rem 0;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.dashboard-widget-form input {
+  padding: 8px;
+  margin-right: 10px;
+  width: 300px;
+}
+
+.dashboard-widget-form button {
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+}

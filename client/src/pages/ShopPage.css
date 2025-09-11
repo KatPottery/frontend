@@ -1,0 +1,128 @@
+.shop-container {
+  padding: 10px;
+  padding-top: 60px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* fixed to 3 columns */
+  gap: 20px;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+  transition: transform 0.2s;
+  background-color: #fff;
+  height: 100%; /* ensures full height card */
+}
+
+.product-card:hover {
+  transform: scale(1.02);
+}
+
+.product-text {
+  padding: 12px 8px;
+  text-align: left;
+}
+
+.product-text .title {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #111;
+  font-weight: 500;
+}
+
+.product-text .price {
+  font-size: 14px;
+  color: #555;
+}
+
+.sold-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(80, 80, 80, 0.6);
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border-radius: 0;
+  pointer-events: none;
+}
+
+
+.price.sold-price {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.5 / 1;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.filter-panel {
+  position: fixed;
+  top: 70px;
+  right: -260px;
+  width: 240px;
+  padding: 20px;
+  background-color: white;
+  border-left: 1px solid #ccc;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: right 0.3s ease;
+}
+
+.filter-panel.open {
+  right: 0;
+}
+
+.filter-panel h3 {
+  margin-top: 0;
+}
+
+.filter-panel label {
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+
+.filter-panel select {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+  background-color: #ccc;
+  color: #111;
+}
+
+.filter-toggle {
+  position: fixed;
+  top: 50px;
+  right: 0px;
+  z-index: 1001;
+  background: #111;
+  color: white;
+  padding: 5px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}

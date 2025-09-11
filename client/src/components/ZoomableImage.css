@@ -1,0 +1,31 @@
+.zoomable-image {
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+  max-width: 100%;
+  height: auto;
+}
+
+.zoom-overlay {
+  padding-top: 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.zoomed-in-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  height: auto;
+  width: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  cursor: zoom-out;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}

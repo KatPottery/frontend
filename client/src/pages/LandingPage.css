@@ -1,0 +1,20 @@
+/* Ensure body stretches */
+body {
+  margin: 0;
+  background-color: #111;
+}
+
+.landing-container {
+  position: relative;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.carousel-wrapper {
+  height: 100vh;
+}
+
+.carousel-wrapper .carousel .slide img {
+  height: 100vh;
+  object-fit: cover;
+}

@@ -1,0 +1,97 @@
+.footer {
+  background-color: #f0f0f0; 
+  color: #111;
+  padding: 20px;
+  padding-bottom: 0px;
+  font-family: sans-serif;
+}
+
+.footer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.footer-col {
+  flex: 1 1 200px;
+}
+
+.footer-col h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-col p,
+.footer-col ul,
+.footer-col li {
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-col li {
+  margin-bottom: 8px;
+}
+
+.footer-col a {
+  color: #111;
+  text-decoration: none;
+}
+
+.footer-col a:hover {
+  text-decoration: underline;
+}
+
+.social-links a {
+  margin-right: 15px;
+  font-size: 14px;
+}
+
+.subscribe-form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subscribe-form input {
+  padding: 8px;
+  font-size: 14px;
+  color: #111;
+  background-color: #ccc;
+  border: 1px solid #ccc;
+}
+
+.subscribe-form button {
+  padding: 8px;
+  font-size: 14px;
+  background-color: #111;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.footer-bottom {
+  border-top: 1px solid #ccc;
+  padding-top: 15px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.legal-links a {
+  margin-left: 20px;
+  color: #111;
+  text-decoration: none;
+}
