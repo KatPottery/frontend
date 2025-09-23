@@ -5,6 +5,15 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Proxy all API requests to your droplet backend
+[[redirects]]
+  from = "/api/*"
+  to   = "http://24.199.105.153:8080/:splat"
+  status = 200
+  force = true
+  headers = { X-Forwarded-Host = ":host", X-Forwarded-Proto = "https" }
+
+# Keep SPA fallback
 [[redirects]]
   from = "/*"
   to   = "/index.html"
