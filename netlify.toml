@@ -8,7 +8,7 @@
 # Proxy all API requests to your droplet backend
 [[redirects]]
   from = "/api/*"
-  to   = "http://24.199.105.153:8080/:splat"
+  to   = "http://24.199.105.153:8080/api/:splat"
   status = 200
   force = true
   headers = { X-Forwarded-Host = ":host", X-Forwarded-Proto = "https" }
