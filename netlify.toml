@@ -13,6 +13,12 @@
   force = true
   headers = { X-Forwarded-Host = ":host", X-Forwarded-Proto = "https" }
 
+[[redirects]]
+  from = "/uploads/*"
+  to   = "http://24.199.105.153:8080/uploads/:splat"
+  status = 200
+  force  = true
+
 # Keep SPA fallback
 [[redirects]]
   from = "/*"
