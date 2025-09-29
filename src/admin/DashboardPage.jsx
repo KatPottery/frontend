@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import './css/DashboardPage.css';
 import StatCard from "./StatCard";
-import WidgetCard from "./WidgetCard"; // 🆕 A new component for custom widgets
+import WidgetCard from "./WidgetCard";
 import WidgetModal from "./WidgetModal";
 
 export default function DashboardPage() {

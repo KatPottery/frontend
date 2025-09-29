@@ -1,5 +1,63 @@
+@font-face {
+    font-family: 'Butler';
+    src: url('/fonts/Butler-UltraLight.woff2') format('woff2'),
+        url('/fonts/Butler-UltraLight.woff') format('woff');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Butler';
+    src: url('/fonts/Butler-Medium.woff2') format('woff2'),
+        url('/fonts/Butler-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Butler';
+    src: url('Butler-Light.woff2') format('woff2'),
+        url('Butler-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Butler';
+    src: url('/fonts/Butler-Black.woff2') format('woff2'),
+        url('/fonts/Butler-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Butler';
+    src: url('/fonts/Butler-Bold.woff2') format('woff2'),
+        url('/fonts/Butler-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Butler';
+    src: url('/fonts/Butler-ExtraBold.woff2') format('woff2'),
+        url('/fonts/Butler-ExtraBold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Butler';
+    src: url('/fonts/Butler.woff2') format('woff2'),
+        url('/fonts/Butler.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+
 :root {
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: 'Butler', sans-serif;
   line-height: 1.5;
   font-weight: 300;
 
@@ -13,6 +71,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -24,13 +83,15 @@ a:hover {
 
 body {
   margin: 0;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: 'Butler', sans-serif;
   background-color: #fff;
+  font-weight: bold;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  font-weight: bold;
 }
 
 button {

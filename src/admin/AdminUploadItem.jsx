@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-} from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Sidebar from "./Sidebar";
-import "./css/AdminLayout.css"; // Reuse your flex layout styles
+import "./css/AdminLayout.css";
 
 export default function AdminPage() {
   const [files, setFiles] = useState([]);
+
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -18,11 +15,23 @@ export default function AdminPage() {
     price: "",
     showInCarousel: false,
     tag: "",
+    isPrint: false,
+    stock: 1,
+    width: "",
+    height: "",
+
+    pottery: {
+      weight: "",
+      dishwasherSafe: false,
+    },
   });
 
+  const isPrint = form.tag === "print";
+  const isPottery = form.tag === "pottery";
+
   const handleFileChange = (e) => {
-    const newFiles = Array.from(e.target.files);
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    const newFiles = Array.from(e.target.files || []);
+    setFiles((prev) => [...prev, ...newFiles]);
   };
 
   const handleDragEnd = (result) => {
@@ -39,22 +48,58 @@ export default function AdminPage() {
 
   const handleUpload = async () => {
     if (files.length === 0) return alert("Please select at least one image.");
+    if (!form.title?.trim()) return alert("Title is required.");
+    if (!form.tag) return alert("Please select a tag.");
 
     const formData = new FormData();
     files.forEach((file) => formData.append("images", file));
-    Object.entries(form).forEach(([key, value]) =>
-      formData.append(key, typeof value === "boolean" ? String(value) : value)
-    );
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("materials", form.materials);
+    formData.append("yearMade", String(form.yearMade || ""));
+    formData.append("price", String(form.price || 0));
+    formData.append("showInCarousel", String(!!form.showInCarousel));
+    formData.append("tag", form.tag);
+
+    formData.append("width", String(Number(form.width) || 0));
+    formData.append("height", String(Number(form.height) || 0));
+
+    formData.append("isPrint", String(isPrint));
+    formData.append("stock", String(isPrint ? (form.stock || 1) : 1));
+
+    if (isPottery) {
+      const potteryPayload = {
+        weight: Number(form.pottery.weight) || 0,
+        dishwasherSafe: !!form.pottery.dishwasherSafe,
+      };
+      formData.append("pottery", JSON.stringify(potteryPayload));
+    }
 
     try {
       const res = await axios.post("/api/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (res.data.success) {
+      if (res.data?.success) {
         alert("Product uploaded successfully!");
         setFiles([]);
+        setForm({
+          title: "",
+          description: "",
+          materials: "",
+          yearMade: "",
+          price: "",
+          showInCarousel: false,
+          tag: "",
+          isPrint: false,
+          stock: 1,
+          width: "",
+          height: "",
+          pottery: { weight: "", dishwasherSafe: false },
+        });
         console.log("Saved:", res.data.product);
+      } else {
+        alert("Upload completed, but server did not return success.");
       }
     } catch (err) {
       console.error("Upload error:", err);
@@ -68,44 +113,74 @@ export default function AdminPage() {
 
       <main className="admin-main">
         <h2>Create New Product</h2>
+
         <div style={{ display: "flex", gap: "40px" }}>
-          {/* Upload Form */}
           <div style={{ flex: 1 }}>
-            <input type="file" multiple onChange={handleFileChange} /><br /><br />
+            <input type="file" accept="image/*" multiple onChange={handleFileChange} />
+            <br /><br />
 
             <input
               type="text"
               placeholder="Title"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-            /><br /><br />
+            />
+            <br /><br />
 
             <textarea
               placeholder="Description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-            /><br /><br />
+            />
+            <br /><br />
 
             <input
               type="text"
               placeholder="Materials"
               value={form.materials}
               onChange={(e) => setForm({ ...form, materials: e.target.value })}
-            /><br /><br />
+            />
+            <br /><br />
 
             <input
               type="number"
               placeholder="Year Made"
               value={form.yearMade}
               onChange={(e) => setForm({ ...form, yearMade: e.target.value })}
-            /><br /><br />
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+            <br /><br />
 
             <input
               type="number"
               placeholder="Price"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
-            /><br /><br />
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+            <br /><br />
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+              <label>
+                Width (mm)
+                <input
+                  type="number"
+                  value={form.width}
+                  onChange={(e) => setForm({ ...form, width: e.target.value })}
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </label>
+              <label>
+                Height (mm)
+                <input
+                  type="number"
+                  value={form.height}
+                  onChange={(e) => setForm({ ...form, height: e.target.value })}
+                  onWheel={(e) => e.currentTarget.blur()}
+                />
+              </label>
+            </div>
+            <br />
 
             <label>
               <input
@@ -116,21 +191,27 @@ export default function AdminPage() {
                 }
               />
               &nbsp; Show in Carousel
-            </label><br /><br />
+            </label>
+            <br /><br />
 
-            <label htmlFor="tag">Tag</label><br />
+            <label htmlFor="tag">Tag</label>
+            <br />
             <select
               id="tag"
               name="tag"
               value={form.tag}
               onChange={(e) => {
-                const selectedTag = e.target.value;
-                setForm({
-                  ...form,
-                  tag: selectedTag,
-                  isPrint: selectedTag === "print",
-                  stock: selectedTag === "print" ? form.stock || 1 : 1, // force stock = 1 for non-print
-                });
+                const tag = e.target.value;
+                setForm((prev) => ({
+                  ...prev,
+                  tag,
+                  isPrint: tag === "print",
+                  stock: tag === "print" ? (prev.stock || 1) : 1,
+                  pottery:
+                    tag === "pottery"
+                      ? prev.pottery
+                      : { weight: "", dishwasherSafe: false },
+                }));
               }}
               required
             >
@@ -139,30 +220,66 @@ export default function AdminPage() {
               <option value="drawing">Drawing</option>
               <option value="pottery">Pottery</option>
               <option value="print">Print</option>
-            </select><br /><br />
+            </select>
+            <br /><br />
 
             <input
-            type="number"
-            placeholder="Stock Quantity"
-            value={form.stock}
-            min={1}
-            readOnly={form.tag !== "print"} 
-            style={{
-              opacity: form.tag === "print" ? 1 : 0.6,
-              cursor: form.tag === "print" ? "auto" : "not-allowed"
-            }}
-            onChange={(e) =>
-              setForm({ ...form, stock: e.target.value })
-            }
-            onWheel={(e) => e.target.blur()} // optional: prevent scroll changing number
-          /><br /><br />
+              type="number"
+              placeholder="Stock Quantity"
+              value={form.stock}
+              min={1}
+              readOnly={!isPrint}
+              style={{
+                opacity: isPrint ? 1 : 0.6,
+                cursor: isPrint ? "auto" : "not-allowed",
+              }}
+              onChange={(e) => setForm({ ...form, stock: e.target.value })}
+              onWheel={(e) => e.currentTarget.blur()}
+            />
+            <br /><br />
 
-
+            {isPottery && (
+              <>
+                <h4>Pottery Details</h4>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
+                  <label>
+                    Weight (g)
+                    <input
+                      type="number"
+                      value={form.pottery.weight}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          pottery: { ...form.pottery, weight: e.target.value },
+                        })
+                      }
+                      onWheel={(e) => e.currentTarget.blur()}
+                    />
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <input
+                      type="checkbox"
+                      checked={!!form.pottery.dishwasherSafe}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          pottery: {
+                            ...form.pottery,
+                            dishwasherSafe: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    Dishwasher Safe
+                  </label>
+                </div>
+                <br />
+              </>
+            )}
 
             <button onClick={handleUpload}>Upload Product</button>
           </div>
 
-          {/* Image Reorder Section */}
           <div style={{ flex: 1 }}>
             <h3>Reorder Images</h3>
             <DragDropContext onDragEnd={handleDragEnd}>
@@ -188,11 +305,7 @@ export default function AdminPage() {
                     <img
                       src={URL.createObjectURL(files[rubric.source.index])}
                       alt={`drag-preview-${rubric.source.index}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </div>
                 )}
@@ -239,11 +352,7 @@ export default function AdminPage() {
                             <img
                               src={URL.createObjectURL(file)}
                               alt={`preview-${index}`}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                              }}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
                             />
                             <button
                               onClick={() => removeImage(index)}

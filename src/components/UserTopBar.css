@@ -8,6 +8,7 @@
   justify-content: space-between;
   background: whitesmoke;
   z-index: 100;
+  align-items: center;
 }
 
 .nav-links {
@@ -15,8 +16,9 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 20px;
-  font-size: 14px;
+  gap: 19px;
+  font-size: 17px;
+  font-size: 900;
   white-space: nowrap;
 }
 

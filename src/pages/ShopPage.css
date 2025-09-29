@@ -26,12 +26,12 @@
 }
 
 .product-text {
-  padding: 12px 8px;
+  padding: 8px 12px;
   text-align: left;
 }
 
 .product-text .title {
-  font-size: 14px;
+  font-size: 24px;
   margin-bottom: 4px;
   color: #111;
   font-weight: 500;

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// LandingPage.jsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import axios from "axios";
@@ -6,36 +7,157 @@ import "./LandingPage.css";
 
 export default function LandingPage() {
   const [products, setProducts] = useState([]);
+  const [activeId, setActiveId] = useState(null);
+  const [paused, setPaused] = useState(false);
+  const [index, setIndex] = useState(0);
+
+  const fadeTimer = useRef(null);
+  const hoveringLegendRef = useRef(false);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    axios.get("/api/products/carousel")
-      .then(res => {
-        console.log("Carousel products:", res.data);
-        setProducts(res.data);
-      })
-      .catch(err => console.error(err));
+    if ("scrollRestoration" in history) {
+      const prev = history.scrollRestoration;
+      history.scrollRestoration = "manual";
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      return () => { history.scrollRestoration = prev; };
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, []);
+
+  useEffect(() => {
+    axios
+      .get("/api/products/carousel")
+      .then((res) => setProducts(res.data || []))
+      .catch(console.error);
+  }, []);
+
+  const slides = useMemo(() => {
+    return (products || []).map(p => ({
+      product: p,
+      image: p?.images?.find(img => img?.showInCarousel),
+      id: String(p?._id ?? p?.slug ?? Math.random())
+    })).filter(s => !!s.image);
+  }, [products]);
+
+  useEffect(() => {
+    if (slides.length === 0) return;
+    setIndex((i) => (i % slides.length + slides.length) % slides.length);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const canRun = slides.length > 1 && !paused && !document.hidden;
+    if (!canRun) return;
+
+    intervalRef.current = setInterval(() => {
+      setIndex((prev) => {
+        if (slides.length <= 1) return prev;
+        const next = (prev + 1) % slides.length;
+        return next;
+      });
+    }, 4000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [slides.length, paused]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      // trigger a re-render to re-run interval effect
+      setIndex((i) => i);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  // Cleanup fade timer on unmount
+  useEffect(() => {
+    return () => { if (fadeTimer.current) clearTimeout(fadeTimer.current); };
+  }, []);
+
+  const scheduleFade = (delay = 500) => {
+    if (fadeTimer.current) clearTimeout(fadeTimer.current);
+    fadeTimer.current = setTimeout(() => {
+      if (!hoveringLegendRef.current) setActiveId(null);
+    }, delay);
+  };
+
+  const ping = (id) => {
+    const key = String(id ?? "");
+    setActiveId(key);
+    if (!hoveringLegendRef.current) scheduleFade(500); // don't fade while over legend
+  };
 
   return (
     <div className="carousel-wrapper">
       <Carousel
-        autoPlay
+        selectedItem={index}
+        onChange={(i) => setIndex(i)}
+        autoPlay={false}
         infiniteLoop
         showThumbs={false}
         showStatus={false}
-        showArrows={true}
+        showArrows
+        stopOnHover={false}
+        interval={4000}
+        transitionTime={700}
+        emulateTouch
+        swipeable
       >
-        {products.map((product, index) => {
-          const image = product.images?.find(img => img.showInCarousel);
-          if (!image) return null;
+        {slides.map(({ product, image, id }) => (
+          <div
+            key={id}
+            className="carousel-slide"
+            onMouseMove={() => ping(id)}
+            onMouseLeave={() => {
+              setActiveId(null);
+              if (!hoveringLegendRef.current) setPaused(false);
+            }}
+            onTouchStart={() => ping(id)}
+            onTouchEnd={() => {
+              setActiveId(null);
+              if (!hoveringLegendRef.current) setPaused(false);
+            }}
+          >
+            <img
+              src={image.url}
+              alt={product.title}
+              onMouseMove={() => ping(id)}
+            />
 
-          return (
-            <div key={product._id || index}>
-              <img src={image.url} alt={product.title} />
-              <p className="legend">{product.title}</p>
-            </div>
-          );
-        })}
+            <a
+              href={`/product/${product.slug}`}
+              className={`custom-legend ${activeId === id ? "visible" : ""}`}
+              onMouseEnter={() => {
+                hoveringLegendRef.current = true;
+                setPaused(true);
+                setActiveId(id);
+                if (fadeTimer.current) clearTimeout(fadeTimer.current);
+              }}
+              onMouseLeave={() => {
+                hoveringLegendRef.current = false;
+                setPaused(false);
+                scheduleFade(500);
+              }}
+            >
+              {product.title}
+            </a>
+          </div>
+        ))}
       </Carousel>
     </div>
   );
