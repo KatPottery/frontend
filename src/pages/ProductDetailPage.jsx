@@ -4,6 +4,13 @@ import axios from "axios";
 import "./ProductDetailPage.css";
 import { getSessionId } from "../utils/session";
 
+const asNum = (v, d = 0) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : d;
+};
+const asBool = (v) =>
+  v === true || v === "true" || v === 1 || v === "1" || v === "on";
+
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
@@ -20,29 +27,33 @@ export default function ProductDetailPage() {
         const p = res.data;
         setProduct(p);
         setSelectedImage(p.images?.[0]?.url || null);
-        if (p.isPrint) {
-          setSelectedQuantity(p.stock > 0 ? 1 : 0);
-        } else {
-          setSelectedQuantity(1);
-        }
+        const stockVal = asNum(p.stock, 0);
+        setSelectedQuantity(p.isPrint ? (stockVal > 0 ? 1 : 0) : 1);
       })
       .catch((err) => console.error("Error loading product:", err));
   }, [slug]);
 
-  const isPrint = !!product?.isPrint;
-  const outOfStock = isPrint && (!product?.stock || product.stock <= 0);
-  const disablePurchase = !!product?.sold || outOfStock;
+  if (!product) return <p>Loading...</p>;
 
-  const fmtDim = (n) =>
-    typeof n === "number" && n > 0 ? `${n} mm` : "—";
-  const fmtWeight = (g) =>
-    typeof g === "number" && g > 0 ? `${g} g` : "—";
+  const isPrint = asBool(product.isPrint);
+  const stockVal = asNum(product.stock, 0);
+  const outOfStock = isPrint && stockVal <= 0;
+  const disablePurchase = !!product.sold || outOfStock;
+
+  const widthVal = asNum(product.width ?? product.dimensions?.width, 0);
+  const heightVal = asNum(product.height ?? product.dimensions?.height, 0);
+
+  const weightVal = asNum(product.pottery?.weight ?? product.weight, 0);
+  const dishwasherSafe = asBool(
+    (product.pottery?.dishwasherSafe ?? product.dishwasherSafe) || false
+  );
+
+  const fmtDim = (n) => (n > 0 ? `${n} mm` : "—");
+  const fmtWeight = (g) => (g > 0 ? `${g} g` : "—");
 
   const handleAddToCart = async () => {
     try {
-      if (adding || clickGuard.current) return;
-      if (!product?._id) return;
-      if (disablePurchase) return;
+      if (adding || clickGuard.current || !product?._id || disablePurchase) return;
 
       clickGuard.current = true;
       setAdding(true);
@@ -52,7 +63,9 @@ export default function ProductDetailPage() {
       await axios.post("/api/cart/add", {
         sessionId,
         productId: product._id,
-        quantity: isPrint ? Math.max(1, Math.min(selectedQuantity, product.stock || 1)) : 1,
+        quantity: isPrint
+          ? Math.max(1, Math.min(selectedQuantity, stockVal || 1))
+          : 1,
         variant: product.variant || product.options || null,
         isPrint: !!product.isPrint,
         idemKey: crypto.randomUUID?.() || String(Date.now()) + Math.random(),
@@ -69,8 +82,6 @@ export default function ProductDetailPage() {
     }
   };
 
-  if (!product) return <p>Loading...</p>;
-
   return (
     <div className="product-detail-layout">
       <div className="product-image">
@@ -78,7 +89,7 @@ export default function ProductDetailPage() {
           src={selectedImage}
           alt={product.title}
           className="main-image"
-          onClick={() => setIsZoomed(true)}
+          onClick={() => selectedImage && setIsZoomed(true)}
           style={{ cursor: selectedImage ? "zoom-in" : "default" }}
         />
 
@@ -86,7 +97,10 @@ export default function ProductDetailPage() {
           <div className="thumbnail-container">
             <div className="thumbnail-row-scroll">
               {product.images.map((img, i) => (
-                <div className="thumbnail-box" key={img._id || img.url || `thumb-${i}`}>
+                <div
+                  className="thumbnail-box"
+                  key={img._id || img.url || `thumb-${i}`}
+                >
                   <img
                     src={img.url}
                     alt={`Thumbnail ${i}`}
@@ -120,23 +134,29 @@ export default function ProductDetailPage() {
         <h3>Materials and Measurements:</h3>
         <p>{product.materials || "N/A"}</p>
         <p>
-          Width: {fmtDim(product.width)} &nbsp; Height: {fmtDim(product.height)}
+          Width: {fmtDim(widthVal)} &nbsp; Height: {fmtDim(heightVal)}
         </p>
 
-        {product.category === "pottery" || product.tag === "pottery" || product.pottery ? (
+        {(product.category === "pottery" ||
+          product.tag === "pottery" ||
+          product.pottery ||
+          product.weight != null ||
+          product.dishwasherSafe != null) && (
           <>
-            <p>Weight: {fmtWeight(product.pottery?.weight)}</p>
+            <p>Weight: {fmtWeight(weightVal)}</p>
             <h3>Dishwasher safe:</h3>
-            <p>{product.pottery?.dishwasherSafe ? "Yes" : "No"}</p>
+            <p>{dishwasherSafe ? "Yes" : "No"}</p>
           </>
-        ) : null}
+        )}
 
         {isPrint ? (
           <p className="stock-info">
-            {outOfStock ? "Out of stock" : `In stock: ${product.stock}`}
+            {outOfStock ? "Out of stock" : `In stock: ${stockVal}`}
           </p>
         ) : (
-          <p className="stock-info">{product.sold ? "Sold out" : "One of a kind"}</p>
+          <p className="stock-info">
+            {product.sold ? "Sold out" : "One of a kind"}
+          </p>
         )}
 
         <div className="actions">
@@ -174,17 +194,16 @@ export default function ProductDetailPage() {
                 id="quantity"
                 type="number"
                 min="1"
-                max={product.stock || 1}
+                max={stockVal || 1}
                 value={selectedQuantity}
                 onChange={(e) => {
                   const n = Number(e.target.value);
                   if (Number.isNaN(n)) return;
-                  const clamped = Math.min(Math.max(1, n), product.stock || 1);
-                  setSelectedQuantity(clamped);
+                  setSelectedQuantity(Math.min(Math.max(1, n), stockVal || 1));
                 }}
                 onWheel={(e) => e.currentTarget.blur()}
               />
-              <span style={{ marginLeft: "8px" }}>in stock: {product.stock}</span>
+              <span style={{ marginLeft: "8px" }}>in stock: {stockVal}</span>
             </div>
           )}
         </div>
