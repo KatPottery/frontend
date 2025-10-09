@@ -12,6 +12,7 @@
 }
 
 .nav-links {
+  text-transform: uppercase;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -23,6 +24,7 @@
 }
 
 .nav-links a {
+  text-transform: uppercase;
   margin-left: 20px;
   color: rgb(0, 0, 0);
   text-decoration: none;

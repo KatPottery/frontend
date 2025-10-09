@@ -8,6 +8,7 @@ import "./LandingPage.css";
 export default function LandingPage() {
   const [products, setProducts] = useState([]);
   const [activeId, setActiveId] = useState(null);
+  const [expandedId, setExpandedId] = useState(null); // NEW
   const [paused, setPaused] = useState(false);
   const [index, setIndex] = useState(0);
 
@@ -34,11 +35,13 @@ export default function LandingPage() {
   }, []);
 
   const slides = useMemo(() => {
-    return (products || []).map(p => ({
-      product: p,
-      image: p?.images?.find(img => img?.showInCarousel),
-      id: String(p?._id ?? p?.slug ?? Math.random())
-    })).filter(s => !!s.image);
+    return (products || [])
+      .map((p) => ({
+        product: p,
+        image: p?.images?.find((img) => img?.showInCarousel),
+        id: String(p?._id ?? p?.slug ?? Math.random()),
+      }))
+      .filter((s) => !!s.image);
   }, [products]);
 
   useEffect(() => {
@@ -51,7 +54,6 @@ export default function LandingPage() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-
     const canRun = slides.length > 1 && !paused && !document.hidden;
     if (!canRun) return;
 
@@ -77,7 +79,6 @@ export default function LandingPage() {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      // trigger a re-render to re-run interval effect
       setIndex((i) => i);
     };
     document.addEventListener("visibilitychange", onVis);
@@ -99,8 +100,13 @@ export default function LandingPage() {
   const ping = (id) => {
     const key = String(id ?? "");
     setActiveId(key);
-    if (!hoveringLegendRef.current) scheduleFade(500); // don't fade while over legend
+    if (!hoveringLegendRef.current) scheduleFade(500);
   };
+
+  // collapse expanded when slide changes
+  useEffect(() => {
+    setExpandedId(null);
+  }, [index]);
 
   return (
     <div className="carousel-wrapper">
@@ -124,38 +130,78 @@ export default function LandingPage() {
             className="carousel-slide"
             onMouseMove={() => ping(id)}
             onMouseLeave={() => {
+              hoveringLegendRef.current = false;
+              setPaused(false);
+              setExpandedId(null);
               setActiveId(null);
-              if (!hoveringLegendRef.current) setPaused(false);
             }}
-            onTouchStart={() => ping(id)}
+            onTouchStart={() => {
+              ping(id);
+              hoveringLegendRef.current = true;
+              setPaused(true);
+              setExpandedId(id);
+            }}
             onTouchEnd={() => {
-              setActiveId(null);
-              if (!hoveringLegendRef.current) setPaused(false);
+              hoveringLegendRef.current = false;
+              setPaused(false);
+              scheduleFade(400);
             }}
           >
-            <img
-              src={image.url}
-              alt={product.title}
-              onMouseMove={() => ping(id)}
-            />
+            <img src={image.url} alt={product.title} onMouseMove={() => ping(id)} />
 
-            <a
-              href={`/product/${product.slug}`}
-              className={`custom-legend ${activeId === id ? "visible" : ""}`}
+            {/* Legend now acts like a button/panel, not a link */}
+            <div
+              role="button"
+              tabIndex={0}
+              className={`custom-legend ${activeId === id ? "visible" : ""} ${expandedId === id ? "expanded" : ""}`}
               onMouseEnter={() => {
                 hoveringLegendRef.current = true;
                 setPaused(true);
                 setActiveId(id);
+                setExpandedId(id);
                 if (fadeTimer.current) clearTimeout(fadeTimer.current);
               }}
               onMouseLeave={() => {
                 hoveringLegendRef.current = false;
                 setPaused(false);
+                setExpandedId(null);
                 scheduleFade(500);
               }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                hoveringLegendRef.current = true;
+                setPaused(true);
+                setActiveId(id);
+                setExpandedId((x) => (x === id ? null : id));
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  hoveringLegendRef.current = true;
+                  setPaused(true);
+                  setActiveId(id);
+                  setExpandedId((x) => (x === id ? null : id));
+                }
+              }}
             >
-              {product.title}
-            </a>
+              <div className="legend-title">{product.title}</div>
+
+              {expandedId === id && (
+                <div className="legend-body" onClick={(e) => e.stopPropagation()}>
+                  <p className="legend-desc">
+                    {product.description?.trim() || "No description available."}
+                  </p>
+                  <a
+                    href={`/product/${product.slug}`}
+                    className="legend-link"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View product →
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </Carousel>
