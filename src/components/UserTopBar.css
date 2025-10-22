@@ -6,6 +6,7 @@
   padding: 12px 24px;
   display: flex;
   justify-content: space-between;
+  border-bottom: 1px solid #d8d8d8;
   background: whitesmoke;
   z-index: 100;
   align-items: center;
@@ -31,7 +32,7 @@
 }
 
 .main-content {
-  padding-top: 0px;
+  padding-top: 12px;
   margin: 0;
   position: relative;
   z-index: 1;
