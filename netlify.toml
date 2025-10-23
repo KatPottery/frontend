@@ -11,6 +11,7 @@
   to   = "https://api.katherinezhao.studio/admin/:splat"
   status = 200
   force = true
+  conditions = { Host = ["admin.katherinezhao.studio"] }
   headers = { X-Forwarded-Host = "admin.katherinezhao.studio", X-Forwarded-Proto = "https" }
 
 [[redirects]]
