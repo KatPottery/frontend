@@ -1,0 +1,2 @@
+# Send AdminJS (and its assets) to the droplet backend
+/admin/*  https://api.katherinezhao.studio/admin/:splat  200
