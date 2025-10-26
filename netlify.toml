@@ -5,23 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# --- Admin host ONLY: proxy admin UI, API, and uploads to backend ---
-[[redirects]]
-  from = "/admin"
-  to   = "https://api.katherinezhao.studio/admin"
-  status = 200
-  force = true
-  conditions = { Host = ["admin.katherinezhao.studio"] }
-  headers = { X-Forwarded-Host = "admin.katherinezhao.studio", X-Forwarded-Proto = "https" }
-
-[[redirects]]
-  from = "/admin/*"
-  to   = "https://api.katherinezhao.studio/admin/:splat"
-  status = 200
-  force = true
-  conditions = { Host = ["admin.katherinezhao.studio"] }
-  headers = { X-Forwarded-Host = "admin.katherinezhao.studio", X-Forwarded-Proto = "https" }
-
+# --- ADMIN host: proxy API/UPLOADS to the droplet ---
 [[redirects]]
   from = "/api/*"
   to   = "https://api.katherinezhao.studio/api/:splat"
@@ -37,7 +21,22 @@
   force = true
   conditions = { Host = ["admin.katherinezhao.studio"] }
 
-# --- (Optional) On the MAIN domain, block /admin paths ---
+# --- MAIN host: proxy API/UPLOADS as well ---
+[[redirects]]
+  from = "/api/*"
+  to   = "https://api.katherinezhao.studio/api/:splat"
+  status = 200
+  force = true
+  conditions = { Host = ["katherinezhao.studio", "www.katherinezhao.studio"] }
+
+[[redirects]]
+  from = "/uploads/*"
+  to   = "https://api.katherinezhao.studio/uploads/:splat"
+  status = 200
+  force = true
+  conditions = { Host = ["katherinezhao.studio", "www.katherinezhao.studio"] }
+
+# --- MAIN host: block /admin paths (optional) ---
 [[redirects]]
   from = "/admin"
   to   = "/"
@@ -52,7 +51,7 @@
   force = true
   conditions = { Host = ["katherinezhao.studio", "www.katherinezhao.studio"] }
 
-# --- SPA fallback (MUST be last) ---
+# --- SPA fallback (last) ---
 [[redirects]]
   from = "/*"
   to   = "/index.html"
