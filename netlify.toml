@@ -5,7 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# --- ADMIN host: proxy API/UPLOADS to the droplet ---
+# ADMIN
 [[redirects]]
   from = "/api/*"
   to   = "https://api.katherinezhao.studio/api/:splat"
@@ -21,7 +21,7 @@
   force = true
   conditions = { Host = ["admin.katherinezhao.studio"] }
 
-# --- MAIN host: proxy API/UPLOADS as well ---
+# MAIN host
 [[redirects]]
   from = "/api/*"
   to   = "https://api.katherinezhao.studio/api/:splat"
@@ -36,7 +36,7 @@
   force = true
   conditions = { Host = ["katherinezhao.studio", "www.katherinezhao.studio"] }
 
-# --- MAIN host: block /admin paths (optional) ---
+# block /admin paths
 [[redirects]]
   from = "/admin"
   to   = "/"

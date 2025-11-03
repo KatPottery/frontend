@@ -8,13 +8,19 @@ import "./LandingPage.css";
 export default function LandingPage() {
   const [products, setProducts] = useState([]);
   const [activeId, setActiveId] = useState(null);
-  const [expandedId, setExpandedId] = useState(null); // NEW
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedId, setExpandedId] = useState(null); 
   const [paused, setPaused] = useState(false);
   const [index, setIndex] = useState(0);
 
   const fadeTimer = useRef(null);
   const hoveringLegendRef = useRef(false);
   const intervalRef = useRef(null);
+
+  const isArray = (x) => Array.isArray(x);
+  const asArray = (x) => (Array.isArray(x) ? x : []);
+
 
   useEffect(() => {
     if ("scrollRestoration" in history) {
@@ -28,20 +34,40 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
+    let alive = true;
+    setLoading(true);
     axios
-      .get("/api/products/carousel")
-      .then((res) => setProducts(res.data || []))
-      .catch(console.error);
+      .get("/api/products/carousel", { withCredentials: true })
+      .then((res) => {
+        const data = res?.data;
+        if (!isArray(data)) {
+          console.warn("Non-array from /api/products/carousel:", data);
+        }
+        if (alive) setProducts(asArray(data));
+      })
+      .catch((e) => {
+        console.error("Fetch carousel failed:", e);
+        if (alive) {
+          setError(e);
+          setProducts([]);
+        }
+      })
+      .finally(() => alive && setLoading(false));
+    return () => { alive = false; };
   }, []);
 
   const slides = useMemo(() => {
-    return (products || [])
-      .map((p) => ({
-        product: p,
-        image: p?.images?.find((img) => img?.showInCarousel),
-        id: String(p?._id ?? p?.slug ?? Math.random()),
-      }))
-      .filter((s) => !!s.image);
+    const list = asArray(products);
+    return list
+      .map((p) => {
+        const imgs = asArray(p?.images);
+        return {
+          product: p,
+          image: imgs.find((img) => img && img.showInCarousel && img.url),
+          id: String(p?._id ?? p?.slug ?? Math.random()),
+        };
+      })
+      .filter((s) => s.image && s.image.url);
   }, [products]);
 
   useEffect(() => {
@@ -108,6 +134,15 @@ export default function LandingPage() {
     setExpandedId(null);
   }, [index]);
 
+  if (loading) return null; // for saftey checks
+  if (error) return <div style={{ padding: 16, color: "crimson" }}>
+    Failed to load featured items. Try refresh.
+  </div>;
+  if (!slides.length) return <div style={{ padding: 16 }}>
+    No featured items yet.
+  </div>;
+
+
   return (
     <div className="carousel-wrapper">
       <Carousel
@@ -147,7 +182,11 @@ export default function LandingPage() {
               scheduleFade(400);
             }}
           >
-            <img src={image.url} alt={product.title} onMouseMove={() => ping(id)} />
+            <img
+              src={image?.url || ""}
+              alt={product?.title || "Product image"}
+              onMouseMove={() => ping(id)}
+            />
 
             {/* Legend now acts like a button/panel, not a link */}
             <div
