@@ -40,10 +40,6 @@ function useUser() {
 
 /* guard for admin routes */
 function AdminRoute() {
-  const { user, loading } = useUser();
-  if (loading) return null; // or a spinner
-  if (!user?.isAuthenticated) return <Navigate to="/" replace />;
-  if (user.role !== "admin") return <Navigate to="/" replace />;
   return <Outlet />;
 }
 
