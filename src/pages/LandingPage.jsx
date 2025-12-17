@@ -1,4 +1,3 @@
-// LandingPage.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";

@@ -64,15 +64,17 @@ export default function App() {
         </Route>
 
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminLayout />} />
-          <Route path="/admin/catalog" element={<AdminCatalogPage />} />
-          <Route path="/admin/upload" element={<AdminImageUpload />} />
-          <Route path="/admin/products" element={<AdminProductPage />} />
-          <Route path="/admin/products/:id/edit" element={<EditProductPage />} />
-          <Route path="/admin/pageviews" element={<PageViewsPage />} />
-          <Route path="/admin/income" element={<IncomePage />} />
-          <Route path="/admin/carts" element={<CartsPage />} />
-          <Route path="/admin/subscribers" element={<SubscribersPage />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminCatalogPage />} />
+            <Route path="catalog" element={<AdminCatalogPage />} />
+            <Route path="upload" element={<AdminImageUpload />} />
+            <Route path="products" element={<AdminProductPage />} />
+            <Route path="products/:id/edit" element={<EditProductPage />} />
+            <Route path="pageviews" element={<PageViewsPage />} />
+            <Route path="income" element={<IncomePage />} />
+            <Route path="carts" element={<CartsPage />} />
+            <Route path="subscribers" element={<SubscribersPage />} />
+          </Route>
         </Route>
       </Routes>
     </Router>
