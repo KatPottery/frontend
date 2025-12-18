@@ -22,21 +22,6 @@ import IncomePage from "./admin/IncomePage";
 import CartsPage from "./admin/CartsPage";
 import SubscribersPage from "./admin/SubscribersPage";
 
-/* hook to read /api/me */
-function useUser() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    let alive = true;
-    fetch("/api/me", { credentials: "include" })
-      .then(r => r.json())
-      .then(u => { if (alive) setUser(u); })
-      .catch(() => { if (alive) setUser(null); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, []);
-  return { user, loading };
-}
 
 /* guard for admin routes */
 function AdminRoute() {
